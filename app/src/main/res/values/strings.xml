@@ -1,3 +1,44 @@
 <resources>
     <string name="app_name">ScanText_GMS</string>
+
+
+    <string name="example_bill">"BAWARCHI
+    RTC
+    HYDERABAD
+    9944994499
+    ORDER: 741
+    DINE IN
+    HOST: B0B
+    06/07/20
+    11:45 AM
+    OTY
+    ITEM
+    PRICE
+    1 CHICKEN BIRYANI
+    2 CHICKEN MASALA
+    4 BUTTER NAAN
+    RS 250.00
+    RS 620. 00
+    RS 160.00
+    CASH
+    SALE
+    SUBTOTAL
+    GST
+    TOTAL
+    RS 1030.00
+    RS 41.20
+    RS 1071.20
+    SALE
+    APPROVED
+    TRANSACTION TYPE
+    AUTHORIZATION:
+    PAYMENT CODE:
+    PAYMENT ID:
+    CARD READER
+    + TIP:
+    = TOTAL
+    CUSTOMER COPY
+    THANKS FOR VISITING
+    BAWARCHI"</string>
 </resources>
+

@@ -22,8 +22,8 @@
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="ocr" />
 
-        <activity android:name=".MainScreenActivity" />
         <activity android:name=".ScanTextOverCamera" />
+        <activity android:name=".ScanTextFromImage" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

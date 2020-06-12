@@ -66,42 +66,22 @@ public class ScanTextOverCamera extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("Test", "invoked startCamera()");
+        Log.d("Test : STOC", "invoked startCamera()");
         setContentView(R.layout.camerasurfacelayout);
-        Log.d("Test", "invoked startCamera()");
-//        onRequestPermissionsResult(RequestCameraPermission,);
+        //onRequestPermissionsResult(RequestCameraPermission,);
         captureButton = findViewById(R.id.capture_image_btn);
         startCamera();
     }
 
-
     public void startCamera() {
-
-        captureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("Debug", "CaptureButton Pressed");
-                Toast.makeText(getApplicationContext(), "CaptureButton Pressed", Toast.LENGTH_SHORT);
-                //resultIntent = getParentActivityIntent();
-                // intent = new Intent(getApplicationContext() ,MainActivity.class);
-                resultIntent = new Intent();
-                resultIntent.putExtra("DetectedText", scannedText);
-                setResult(Activity.RESULT_OK, resultIntent);
-                finish();
-                //startActivity(intent);
-                //startActivityForResult();
-
-                //setContentView(R.layout.activity_main);
-            }
-        });
-
         cameraView = (SurfaceView) findViewById(R.id.surface_view);
         textBlockContent = (TextView) findViewById(R.id.text_value);
 
         final TextRecognizer textRecognizer = new TextRecognizer.Builder(getApplicationContext()).build();
         if (!textRecognizer.isOperational()) {
-            Log.w("MainActivity", "Detector dependencies are not yet available.");
+            Log.w("Test:ScanTextOverCamera", "Detector dependencies are not yet available.");
         }
+        Log.w("Test:ScanTextOverCamera", "initiating CameraSource");
         cameraSource = new CameraSource.Builder(getApplicationContext(), textRecognizer)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(1280, 1024)
@@ -127,17 +107,20 @@ public class ScanTextOverCamera extends AppCompatActivity {
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                Log.w("Test:ScanTextOverCamera", "surfaceChanged");
             }
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
                 cameraSource.stop();
+                Log.w("Test:ScanTextOverCamera", "SurfaceDestroyed");
             }
         });
 
         textRecognizer.setProcessor(new Detector.Processor<TextBlock>() {
             @Override
             public void release() {
+                Log.w("Test:ScanTextOverCamera", "release");
 
             }
 
@@ -168,6 +151,24 @@ public class ScanTextOverCamera extends AppCompatActivity {
 
             }
         });
+
+        captureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("Debug", "CaptureButton Pressed");
+                Toast.makeText(getApplicationContext(), "CaptureButton Pressed", Toast.LENGTH_SHORT);
+                //resultIntent = getParentActivityIntent();
+                // intent = new Intent(getApplicationContext() ,MainActivity.class);
+                resultIntent = new Intent();
+                resultIntent.putExtra("DetectedTextFromCamera", scannedText);
+                setResult(Activity.RESULT_OK, resultIntent);
+                finish();
+                //startActivity(intent);
+                //startActivityForResult();
+                //setContentView(R.layout.activity_main);
+            }
+        });
+
     }
 
     @Override

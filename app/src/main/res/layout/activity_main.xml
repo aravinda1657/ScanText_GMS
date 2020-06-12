@@ -16,33 +16,33 @@
         android:id="@+id/text_display"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/capture_bill_btn"
+        android:elegantTextHeight="true"
         android:hint="Input Bill "
+        android:maxLines="30"
+        android:scrollbars="vertical"
         android:text=""
-        android:textSize="26dp" />
-
+        android:textSize="20dp" />
     <Button
-        android:id="@+id/capture_image_btn"
+        android:id="@+id/capture_bill_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="50dp"
+        android:layout_above="@+id/pickbillfromgallary_btn"
         android:background="@color/colorAccent"
-        android:text="Capture Image"
+        android:text="Capture Bill"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
-        tools:ignore="UnknownId" />
+        android:textSize="17dp" />
 
     <Button
-        android:id="@+id/detect_text_image_btn"
+        android:id="@+id/pickbillfromgallary_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="Detect Text"
+        android:text="Pick Bill from Gallary"
         android:textAllCaps="false"
         android:background="@color/colorPrimary"
         android:textColor="@android:color/white"
         android:textSize="17dp"
         />
-
-
 </RelativeLayout>

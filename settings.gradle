@@ -1,2 +1,4 @@
+include ':JavaModule'
+include ':JavaTestLibrary'
 include ':app'
 rootProject.name = "ScanText_GMS"

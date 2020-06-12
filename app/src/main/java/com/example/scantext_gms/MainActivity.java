@@ -15,9 +15,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
-    int requestCode;
+    int scanTextOverCamera_requestCode = 1, scanTextFromImage_requestCode = 2;
     String scannedText;
-    private Button captureImageBtn, detectTextBtn;
+    private Button captureBillBtn, pickBillFromGallaryBtn;
     private ImageView imageView;
     private EditText editTextView;
 
@@ -26,43 +26,49 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        captureImageBtn = findViewById(R.id.capture_image_btn);
-        detectTextBtn = findViewById(R.id.detect_text_image_btn);
+        captureBillBtn = findViewById(R.id.capture_bill_btn);
+        pickBillFromGallaryBtn = findViewById(R.id.pickbillfromgallary_btn);
         imageView = findViewById(R.id.image_view);
         editTextView = findViewById(R.id.text_display);
 
-        captureImageBtn.setOnClickListener(new View.OnClickListener() {
+        captureBillBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("Test", "invoke startCamera()");
-                Toast.makeText(getApplicationContext(), "Invoke startCamera()", Toast.LENGTH_SHORT);
-                //startActivity(new Intent(MainActivity.this, ScanTextOverCamera.class));
-                startActivityForResult(new Intent(MainActivity.this, ScanTextOverCamera.class), requestCode);
-
-
+                Log.d("Test : MainActivity", "Invoking startCamera()");
+                Toast.makeText(getApplicationContext(), "Invoking startCamera()", Toast.LENGTH_SHORT);
+                //startActivity(new Intent(MainActivity.this, ScanTextOverCamera.class));// //
+                startActivityForResult(new Intent(MainActivity.this, ScanTextOverCamera.class), scanTextOverCamera_requestCode);
             }
         });
 
-
-        detectTextBtn.setOnClickListener(new View.OnClickListener() {
+        pickBillFromGallaryBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("Test : MainActivity", "invoking ScanTextFromImage()");
+                //startActivity(new Intent(MainActivity.this, ScanTextFromImage.class) );
+                startActivityForResult(new Intent(MainActivity.this, ScanTextFromImage.class), scanTextFromImage_requestCode);
             }
         });
-
-        //   startActivity(new Intent(MainActivity.this, MainScreenActivity.class));
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.i("Test", "Result Text:");
-
+        Log.i("Test : MainActivity", "onActivityResult " + requestCode + " " + resultCode);
         if (resultCode == Activity.RESULT_OK) {
-            scannedText = data.getStringExtra("DetectedText");
-            Log.i("Test", "Result Text:" + scannedText);
-            // TODO Update your TextView.
-            editTextView.setText(scannedText);
+            switch (requestCode) {
+                case 1:
+                    scannedText = data.getStringExtra("DetectedTextFromCamera");
+                    break;
+                case 2:
+                    scannedText = data.getStringExtra("DetectedTextFromImage");
+                    break;
+                default:
+                    Log.e("Test : MainActivity", "requestCode Not Found");
+            }
         }
+        Log.d("Test : MainActivity", "Result Text:" + scannedText);
+        // TODO Update your TextView.
+        editTextView.setText(scannedText);
     }
 }

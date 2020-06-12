@@ -1,5 +1,5 @@
 package com.example.scantext_gms;
-
+/*
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -44,3 +44,4 @@ public class MainScreenActivity extends AppCompatActivity{
 
 
 }
+ */
