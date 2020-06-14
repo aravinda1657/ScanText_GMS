@@ -45,4 +45,17 @@
         android:textColor="@android:color/white"
         android:textSize="17dp"
         />
+
+    <Button
+        android:id="@+id/getItemsFromText_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/capture_bill_btn"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="3dp"
+        android:background="@color/colorPrimary"
+        android:text="Get Products"
+        android:textColor="@android:color/white" />
+
 </RelativeLayout>
