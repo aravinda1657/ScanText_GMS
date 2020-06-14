@@ -12,10 +12,12 @@ import java.util.List;
 import java.util.jar.JarEntry;
 
 public class BillFilter {
-    public static List<Product> FilterBill() {
+    public static List<Product> FilterBill(String scannedText) {
         System.out.println("Hi");
 
-        String billString = "BAWARCHI\n" +
+        String billString = scannedText;
+
+/*        String billString = "BAWARCHI\n" +
                 "    RTC\n" +
                 "    HYDERABAD\n" +
                 "    9944994499\n" +
@@ -54,6 +56,8 @@ public class BillFilter {
                 "    THANKS FOR VISITING\n" +
                 "    BAWARCHI";
 
+ */
+
         String[] billStringArray = billString.split("\n");
         List<Product> products = new ArrayList<Product>();
 
@@ -85,9 +89,10 @@ public class BillFilter {
 
 
                 if ((itemsNamesIdentifier == 1) && !billStringArray[i].toLowerCase().contains("price")) {
-                    items.add(billStringArray[i].trim());
+                    items.add(billStringArray[i].substring(billStringArray[i].trim().indexOf(" ")));
 
                 } else if (priceIdentifier == 1) {
+                    billStringArray[i]=billStringArray[i].substring(0,billStringArray[i].indexOf("."));
                     prices.add(Integer.parseInt(billStringArray[i].toLowerCase().replace("rs", "").trim()));
                 }
 

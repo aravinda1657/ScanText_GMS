@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         getItemsFromText_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                scannedText = editTextView.getText().toString();
                 initilizeBaseProductsJSON();
                 jsonParseProducts();
                 editTextView.setText(myProducts);
@@ -140,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void jsonParseProducts() {
 
-        List<Product> newProducts = BillFilter.FilterBill();
+        List<Product> newProducts = BillFilter.FilterBill(scannedText);
         //Print Products
         myProducts="Product      Price      Category \n";
         for (int i = 0; i < newProducts.size(); i++) {
