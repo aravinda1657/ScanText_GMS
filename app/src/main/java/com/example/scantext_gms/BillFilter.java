@@ -92,7 +92,10 @@ public class BillFilter {
                     items.add(billStringArray[i].substring(billStringArray[i].trim().indexOf(" ")));
 
                 } else if (priceIdentifier == 1) {
-                    billStringArray[i]=billStringArray[i].substring(0,billStringArray[i].indexOf("."));
+
+                    if (billStringArray[i].contains(".")){
+                        billStringArray[i]=billStringArray[i].substring(0,billStringArray[i].indexOf("."));
+                    }
                     prices.add(Integer.parseInt(billStringArray[i].toLowerCase().replace("rs", "").trim()));
                 }
 
