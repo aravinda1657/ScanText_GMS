@@ -58,4 +58,15 @@
         android:text="Get Products"
         android:textColor="@android:color/white" />
 
+    <Button
+        android:id="@+id/spendAnalytics"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/getItemsFromText_btn"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="0dp"
+        android:background="@color/colorAccent"
+        android:text="Analyse Spends" />
+
 </RelativeLayout>

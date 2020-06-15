@@ -84,7 +84,7 @@ public class BillFilter {
                 if (billStringArray[i].toLowerCase().contains("price")) {
                     itemsNamesIdentifier = 1;
                     priceIdentifier = 0;
-                } else if (billStringArray[i].toLowerCase().contains("rs")) {
+                } else if (billStringArray[i].toLowerCase().contains("rs") && billStringArray[i].toLowerCase().startsWith("rs") ) {
                     priceIdentifier = 1;
                     itemsNamesIdentifier = 0;
                 } else if (priceIdentifier == 1) {

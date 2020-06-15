@@ -43,7 +43,7 @@ public class Product {
     public void setMessages(List<String> messages) {
         this.messages = messages;
     }
-*/
+
     @Override
     public String toString() {
         return "Product{" +
@@ -52,5 +52,7 @@ public class Product {
                 ", catogory=" + catogory +
  //               ", messages=" + messages +
                 '}';
+
+   */
     }
 }
