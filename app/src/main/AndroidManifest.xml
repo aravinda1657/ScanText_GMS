@@ -25,6 +25,8 @@
 
         <activity android:name=".ScanTextOverCamera" />
         <activity android:name=".ScanTextFromImage" />
+        <activity android:name=".MainActivity_Json" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

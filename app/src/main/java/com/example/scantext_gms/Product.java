@@ -1,6 +1,5 @@
 package com.example.scantext_gms;
 
-
 public class Product {
     String name;
     int price;
@@ -8,6 +7,9 @@ public class Product {
 
     //List<String> messages;
 
+    public Product(){
+
+    }
     public String getName() {
         return name;
     }
@@ -42,17 +44,28 @@ public class Product {
         this.messages = messages;
     }
 */
-    @Override
+    //@Override
     public String toString() {
-        return "{" +
+        return "Product{" +
                 "name='" + name + '\'' +
                 ", price=" + price +
                 ", catogory=" + catogory +
- //               ", messages=" + messages +
                 '}';
     }
+
     public String toString2() {
         return name + " " + price + " " + catogory + '\n';
     }
+
+    public Product getProductObj() {
+        Product tempProduct = new Product();
+        tempProduct.name=name;
+        tempProduct.price=price;
+        tempProduct.catogory=catogory;
+
+        return tempProduct;
+
+    }
+
 }
 

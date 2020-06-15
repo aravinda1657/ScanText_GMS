@@ -1,6 +1,7 @@
 package com.example.scantext_gms;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,18 +15,36 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONObject;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import java.lang.Appendable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,32 +55,36 @@ public class MainActivity extends AppCompatActivity {
     private EditText editTextView;
 
     private Button getItemsFromText_btn;
-    private EditText editText_MyProducts;
-    String myProducts;
 
-
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         captureBillBtn = findViewById(R.id.capture_bill_btn);
         pickBillFromGallaryBtn = findViewById(R.id.pickbillfromgallary_btn);
         imageView = findViewById(R.id.image_view);
         editTextView = findViewById(R.id.text_display);
-        getItemsFromText_btn=findViewById(R.id.getItemsFromText_btn);
 
+        getItemsFromText_btn = findViewById(R.id.getItemsFromText_btn);
 
+        scannedText = editTextView.getText().toString();
+        initilizeBaseProductsJSON();
+
+        getItemsFromText_btn.callOnClick();
 
         captureBillBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("Test : MainActivity", "Invoking startCamera()");
+
+               /* Log.d("Test : MainActivity", "Invoking startCamera()");
                 Toast.makeText(getApplicationContext(), "Invoking startCamera()", Toast.LENGTH_SHORT);
                 //startActivity(new Intent(MainActivity.this, ScanTextOverCamera.class));// //
                 startActivityForResult(new Intent(MainActivity.this, ScanTextOverCamera.class), scanTextOverCamera_requestCode);
+        */
+                startActivityForResult(new Intent(MainActivity.this, MainActivity_Json.class), scanTextOverCamera_requestCode);
             }
         });
 
@@ -78,9 +101,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 scannedText = editTextView.getText().toString();
-                initilizeBaseProductsJSON();
                 jsonParseProducts();
-                editTextView.setText(myProducts);
+                editTextView.setText(scannedText);
             }
         });
     }
@@ -107,110 +129,132 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void initilizeBaseProductsJSON() {
-
     /*    String jsonFileInApp_String = Utils.getJsonFromAssets(getApplicationContext(), "BaseProducts.json");
        // Log.i("AppTest_Main: Productdata", jsonFileInApp_String);
      */
         try {
             InputStream is = getAssets().open("BaseProducts.json");
-            File destination = new File(getApplicationContext().getFilesDir()+"/BaseProducts.json");
+//            File destination = new File(getApplicationContext().getFilesDir() + "/BaseProducts.json");
+            File destination = new File(context.getExternalFilesDir(null)+ "/BaseProducts.json");
+
             Log.i("AppTest_Main : Paths", is.toString() + "  " + destination.toString());
-            copyFileUsingStream(is, destination);
-
+            JsonReadWrite.copyFileUsingStream(is, destination);
         } catch (Exception e) {
-            Log.i("AppTest_Main : Productdata", "ErrorCopying file : "+ e.getMessage() );
+            Log.i("AppTest_Main : Productdata", "ErrorCopying file : " + e.getMessage());
         }
     }
 
-    private static void copyFileUsingStream(InputStream source, File dest) throws IOException {
-        InputStream is = source;
-        OutputStream os = null;
-        try {
-            // is = new FileInputStream(source);
-            os = new FileOutputStream(dest);
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = is.read(buffer)) > 0) {
-                os.write(buffer, 0, length);
-            }
-        } finally {
-            is.close();
-            os.close();
-        }
-    }
 
     public void jsonParseProducts() {
 
+        Map<String, Product> baseProductsMapDictionary = new HashMap<String, Product>();
+        List<Product> baseProducts = new ArrayList<Product>();
         List<Product> newProducts = BillFilter.FilterBill(scannedText);
-        //Print Products
-        myProducts="Product      Price      Category \n";
+
+        try {
+            //getObjectsFrombaseJSONFile - Converts base JSON String to Objects
+            Reader reader = Files.newBufferedReader(Paths.get(getApplicationContext().getFilesDir() + "/BaseProducts.json"));
+            baseProducts = JsonReadWrite.getObjectsFrombaseJSONFile(reader);
+            if (baseProducts != null) {
+                //convertObjectsoDict - Converts baseObjectsToDictionary
+                baseProductsMapDictionary = JsonReadWrite.convertObjectsoDict(baseProducts);
+            } else {
+                Log.e("AppTest_Main : Json ", "Error : baseProducts is empty  ");
+            }
+
+            //getCatogoryFromBaseProductsJSONFile - Assigns catogory of known products to products Object.
+            newProducts = JsonReadWrite.getCatogoryFromBaseProductsJSONFile(newProducts, baseProductsMapDictionary);
+
+            //Append the Newly Semi - Catogorized Products into UserProducts.Json
+            //Design Would you like to save - Dialog in future
+         /*   Writer writer = Files.newBufferedWriter(Paths.get(getApplicationContext().getFilesDir() + "/UserProducts.json"));
+            Log.i("AppTest_JRW : Json ", "Executing : writeObjectsToUserJSONFile" +
+                    Paths.get(getApplicationContext().getFilesDir() + "/UserProducts.json"));
+            // create Gson instance with pretty-print
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Type listProductType = new TypeToken<List<Product>>() {}.getType();
+            gson.toJson(newProducts,listProductType, writer);
+
+             writer = Files.newBufferedWriter(Paths.get(getApplicationContext().getFilesDir() + "/UserProducts.json"));
+            JsonReadWrite.writeObjectsToUserJSONFile(newProducts, writer);
+*/
+            Gson gson = new Gson();
+            Type listProductType = new TypeToken<List<Product>>() {}.getType();
+
+
+            Writer writer = Files.newBufferedWriter(Paths.get(context.getExternalFilesDir(null) + "/UserProducts.json"));
+            JsonReadWrite.writeObjectsToUserJSONFile(newProducts, writer);
+
+
+
+
+            /*File path = context.getExternalFilesDir(null);
+            File file = new File(path, filename);
+            try {
+
+                om.writerWithDefaultPrettyPrinter().writeValue(file, carList);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
+/*
+            JSONObject obj = new JSONObject();
+            obj.put("Name", "Crunchify.com");
+            obj.put("Author", "App Shah");
+             FileWriter file;
+            file = new FileWriter(String.valueOf(Paths.get(getApplicationContext().getFilesDir() + "/UserProducts.json")));
+          //  file.write(obj.toJSONString());
+
+            java.lang.Appendable Writer2 = new FileWriter(String.valueOf(Paths.get(getApplicationContext().getFilesDir() + "/UserProducts.json")));
+            gson.toJson(newProducts,listProductType, Writer2);
+*/
+
+
+ /*           JSONObject main = new JSONObject();
+            JSONParser jsonParser = new JSONParser();
+
+            try {
+                Object obj = jsonParser.parse(new FileReader("D:\\student.json"));
+                JSONArray jsonArray = (JSONArray)obj;
+
+                System.out.println(jsonArray);
+
+                JSONObject student1 = new JSONObject();
+                student1.put("name", "BROCK");
+                student1.put("age", new Integer(3));
+
+                JSONObject student2 = new JSONObject();
+                student2.put("name", "Joe");
+                student2.put("age", new Integer(4));
+
+                jsonArray.add(student1);
+                jsonArray.add(student2);
+
+                System.out.println(jsonArray);
+
+                FileWriter file = new FileWriter("D:\\student.json");
+                file.write(jsonArray.toJSONString());
+                file.flush();
+                file.close();
+*/
+
+       /*     } catch (ParseException | IOException e) {
+                e.printStackTrace();
+            }
+*/
+
+
+        } catch (Exception e) {
+            Log.e("AppTest_Main : Json ", "Error : " + e.getMessage());
+        }
+
+        //Print Products to String
+        scannedText = "Product      Price      Category \n"; //Append this in Activity
         for (int i = 0; i < newProducts.size(); i++) {
             Log.i("AppTest_Main : Productdata", "> initial_Items " + i + "\n" + newProducts.get(i));
             System.out.println("AppTest_Main :  > initial_Items " + i + "\n" + newProducts.get(i));
-            myProducts=myProducts+newProducts.get(i).toString2();
+            scannedText = scannedText + newProducts.get(i).toString2();
         }
-
-
-
-/*
-        String jsonFileString = Utils.getJsonFromAssets(getApplicationContext(), "products.json");
-        Log.i("AppTest_Main: Productdata", jsonFileString);
-
-        Gson gson = new Gson();
-
-        Type listProductType = new TypeToken<List<Product>>() {
-        }.getType();
-        //Convert JSON to Objects
-        List<Product> products = gson.fromJson(jsonFileString, listProductType);
-
-        for (int i = 0; i < products.size(); i++) {
-            Log.i("AppTest_Main: data", "> Item " + i + "\n" + products.get(i));
-        }
-
-        Product myProduct = new Product();
-        myProduct.name = "Snickers";
-        myProduct.price = 61;
-        myProduct.catogory = "Unknown";
-
-        String json = new Gson().toJson(myProduct);
-        System.out.println(json);
-        Log.i("AppTest_Main: Productdata", json);
-
-      /*  Gson gson2 = new Gson();
-        Writer output = null;
-        File file = new File("storage/sdcard/ExpensesCatogorization/" + "Products" + ".json");
-        try {
-
-
-           Log.i("AppTest_Main: Productdata", "1 Writing To Json    Path :" + getApplicationContext().getFilesDir());
-            File mediaStorageDir = new File(getApplicationContext().getFilesDir(), "EC");
-
-            if (!mediaStorageDir.exists()) {
-                if (!mediaStorageDir.mkdirs()) {
-                    Log.d("App", "1 failed to create directory");
-                }
-            }
-
-            output = new BufferedWriter(new FileWriter(file));
-            output.write(json.toString());
-        } catch (IOException e) {
-           Log.i("AppTest_Main: Productdata", "1 Error Writing To Json");
-            e.printStackTrace();
-        }
-
-        try (Writer writer = Files.newBufferedWriter(Paths.get(getApplicationContext().getFilesDir() + "/EC/" + "Products.json"))) {
-            Log.i("AppTest_Main: Productdata", "Writing To Json");
-            gson.toJson(myProduct, writer);
-            writer.append(myProduct.toString());
-            writer.append(myProduct.toString());
-            //  writeJsonFile()
-
-        } catch (IOException e) {
-            Log.i("AppTest_Main : Productdata", "Error Writing To Json : "+ e.getMessage() );
-            e.printStackTrace();
-        }
-*/
 
     }
-
 }

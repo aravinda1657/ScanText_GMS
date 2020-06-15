@@ -15,48 +15,54 @@ public class BillFilter {
     public static List<Product> FilterBill(String scannedText) {
         System.out.println("Hi");
 
-        String billString = scannedText;
+        String billString;
+        if(!scannedText.isEmpty()) {
+             billString = scannedText;
+        }else {
+             billString = "BAWARCHI\n" +
+                    "    RTC\n" +
+                    "    HYDERABAD\n" +
+                    "    9944994499\n" +
+                    "    ORDER: 741\n" +
+                    "    DINE IN\n" +
+                    "    HOST: B0B\n" +
+                    "    06/07/20\n" +
+                    "    11:45 AM\n" +
+                    "    OTY\n" +
+                    "    ITEM\n" +
+                    "    PRICE\n" +
+                    "    1 CHICKEN BIRYANI\n" +
+                    "    2 CHICKEN MASALA\n" +
+                    "    4 BUTTER NAAN\n" +
+                     "   1 Xbox\n" +
+                     "   2 Marie Gold\n" +
+                    "    RS 250\n" +
+                    "    RS 620\n" +
+                    "    RS 160\n" +
+                     "    RS 2500\n" +
+                     "    RS 120\n" +
+                     "    CASH\n" +
+                    "    SALE\n" +
+                    "    SUBTOTAL\n" +
+                    "    GST\n" +
+                    "    TOTAL\n" +
+                    "    RS 1030.00\n" +
+                    "    RS 41.20\n" +
+                    "    RS 1071.20\n" +
+                    "    SALE\n" +
+                    "    APPROVED\n" +
+                    "    TRANSACTION TYPE\n" +
+                    "    AUTHORIZATION:\n" +
+                    "    PAYMENT CODE:\n" +
+                    "    PAYMENT ID:\n" +
+                    "    CARD READER\n" +
+                    "    + TIP:\n" +
+                    "    = TOTAL\n" +
+                    "    CUSTOMER COPY\n" +
+                    "    THANKS FOR VISITING\n" +
+                    "    BAWARCHI";
+        }
 
-/*        String billString = "BAWARCHI\n" +
-                "    RTC\n" +
-                "    HYDERABAD\n" +
-                "    9944994499\n" +
-                "    ORDER: 741\n" +
-                "    DINE IN\n" +
-                "    HOST: B0B\n" +
-                "    06/07/20\n" +
-                "    11:45 AM\n" +
-                "    OTY\n" +
-                "    ITEM\n" +
-                "    PRICE\n" +
-                "    1 CHICKEN BIRYANI\n" +
-                "    2 CHICKEN MASALA\n" +
-                "    4 BUTTER NAAN\n" +
-                "    RS 250\n" +
-                "    RS 620\n" +
-                "    RS 160\n" +
-                "    CASH\n" +
-                "    SALE\n" +
-                "    SUBTOTAL\n" +
-                "    GST\n" +
-                "    TOTAL\n" +
-                "    RS 1030.00\n" +
-                "    RS 41.20\n" +
-                "    RS 1071.20\n" +
-                "    SALE\n" +
-                "    APPROVED\n" +
-                "    TRANSACTION TYPE\n" +
-                "    AUTHORIZATION:\n" +
-                "    PAYMENT CODE:\n" +
-                "    PAYMENT ID:\n" +
-                "    CARD READER\n" +
-                "    + TIP:\n" +
-                "    = TOTAL\n" +
-                "    CUSTOMER COPY\n" +
-                "    THANKS FOR VISITING\n" +
-                "    BAWARCHI";
-
- */
 
         String[] billStringArray = billString.split("\n");
         List<Product> products = new ArrayList<Product>();
@@ -89,7 +95,8 @@ public class BillFilter {
 
 
                 if ((itemsNamesIdentifier == 1) && !billStringArray[i].toLowerCase().contains("price")) {
-                    items.add(billStringArray[i].substring(billStringArray[i].trim().indexOf(" ")));
+                    billStringArray[i]=billStringArray[i].trim();
+                    items.add(billStringArray[i].substring(billStringArray[i].trim().indexOf(" ")+1));
 
                 } else if (priceIdentifier == 1) {
 
@@ -105,7 +112,7 @@ public class BillFilter {
                 Product temp = new Product();
                 temp.name = items.get(i);
                 temp.price = prices.get(i);
-                temp.catogory = "Unknown";
+                temp.catogory = "Other";
                 products.add(temp);
                 System.out.println("AppTest_BF :  added " + i + "\n" + products.get(i));
             }
@@ -121,8 +128,6 @@ public class BillFilter {
         } catch (Exception e) {
             Log.e("AppTest_BF : dataError", e.getMessage());
         }
-
         return products;
     }
-
 }
