@@ -44,8 +44,8 @@ public class Product {
         this.messages = messages;
     }
 */
-    //@Override
-    public String toString() {
+    @Override
+      public String toString() {
         return "Product{" +
                 "name='" + name + '\'' +
                 ", price=" + price +

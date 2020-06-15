@@ -14,7 +14,6 @@ import java.util.jar.JarEntry;
 public class BillFilter {
     public static List<Product> FilterBill(String scannedText) {
         System.out.println("Hi");
-
         String billString;
         if(!scannedText.isEmpty()) {
              billString = scannedText;

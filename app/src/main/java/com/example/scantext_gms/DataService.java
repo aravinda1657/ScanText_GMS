@@ -12,7 +12,6 @@ import java.util.List;
 public class DataService {
 
     Context context;
-
     ObjectMapper om = new ObjectMapper();
 
 
@@ -21,7 +20,6 @@ public class DataService {
     }
 
     public void writeList(CarList carList, String filename) {
-
 
         File path = context.getExternalFilesDir(null);
         File file = new File(path, filename);
@@ -47,7 +45,5 @@ public class DataService {
             e.printStackTrace();
         }
         return returnList;
-
-
     }
 }

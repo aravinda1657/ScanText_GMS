@@ -127,9 +127,15 @@ public class JsonReadWrite {
             String json = new Gson().toJson(newProducts);
             Log.i("AppTest_JRW : Json ", "writeObjectsToUserJSONFile" + json);
 
+            for(int i=0; i<newProducts.size();i++)
+            {
+                Log.e("AppTest_ : Json ", newProducts.get(i).name);
+            }
             Gson gson = new Gson();
-            Type listProductType = new TypeToken<List<Product>>() {
-            }.getType();
+            Type listProductType = new TypeToken<List<Product>>() {}.getType();
+            Log.e("AppTest_ : Json Type ", listProductType.toString());
+            //Log.e("AppTest_ : Json Type ", getType());
+
             gson.toJson(newProducts,listProductType, writer);
         } catch (Exception e) {
             Log.e("AppTest_JRW : Json ", "Error : writeObjectsToUserJSONFile" + e.getMessage());

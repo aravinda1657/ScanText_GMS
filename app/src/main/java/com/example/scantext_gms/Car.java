@@ -17,7 +17,6 @@ public class Car {
         this.year = year;
         this.make = make;
     }
-
     public Car() {
 
     }

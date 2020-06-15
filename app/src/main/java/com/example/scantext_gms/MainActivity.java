@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -75,13 +76,14 @@ public class MainActivity extends AppCompatActivity {
         getItemsFromText_btn = findViewById(R.id.getItemsFromText_btn);
 
         scannedText = editTextView.getText().toString();
-      ////
-        prefs = getSharedPreferences("com.example.scantext_gms", MODE_PRIVATE);
 
+        //TODO implement on First Run Method
+        initilizeBaseProductsJSON();
+        prefs = getSharedPreferences("com.example.scantext_gms", MODE_PRIVATE);
         if (prefs.getBoolean("firstrun", true)) {
             // Do first run stuff here then set 'firstrun' as false
             // using the following line to edit/commit prefs
-            initilizeBaseProductsJSON();
+            //initilizeBaseProductsJSON();
             prefs.edit().putBoolean("firstrun", false).commit();
         }
 
@@ -154,9 +156,14 @@ public class MainActivity extends AppCompatActivity {
         try {
             InputStream is = getAssets().open("BaseProducts.json");
             File destinationSystem = new File(getApplicationContext().getFilesDir() + "/BaseProducts.json");
-            JsonReadWrite.copyFileUsingStream(is, destinationSystem);
+            Log.i("AppTest_Main : Paths : System-Data", is.toString() + "  " + destinationSystem.toString());
+            JsonReadWrite.copyFileUsingStream( is,destinationSystem);
 
-            File destination = new File(context.getExternalFilesDir(null) + "/BaseProducts.json");
+//context.getExternalFilesDir()
+
+            File directory_documents = Environment.getExternalStoragePublicDirectory("DIRECTORY_DOCUMENTS");//Creates a public directory for app.
+            Log.i("AppTest_Main : Paths", is.toString() + "Executing getApplicationContext().getExternalFilesDir(null) ");
+            File destination = new File(getApplicationContext().getExternalFilesDir(null) + "/BaseProducts.json");
             Log.i("AppTest_Main : Paths", is.toString() + "  " + destination.toString());
             JsonReadWrite.copyFileUsingStream(is, destination);
 
@@ -184,6 +191,11 @@ public class MainActivity extends AppCompatActivity {
 
             //getCatogoryFromBaseProductsJSONFile - Assigns catogory of known products to products Object.
             newProducts = JsonReadWrite.getCatogoryFromBaseProductsJSONFile(newProducts, baseProductsMapDictionary);
+
+
+            Writer writer = Files.newBufferedWriter(Paths.get(getApplicationContext().getFilesDir() + "/UserProducts.json"));
+            JsonReadWrite.writeObjectsToUserJSONFile(newProducts, writer);
+
 
             //implement Update UserJson File with new products
             //impelemet Read updated user Json File
