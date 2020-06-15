@@ -7,9 +7,12 @@ public class Product {
 
     //List<String> messages;
 
-    public Product(){
-
+    public Product() {
+        this.name = name;
+        this.price = price;
+        this.catogory = catogory;
     }
+
     public String getName() {
         return name;
     }
@@ -35,37 +38,51 @@ public class Product {
         this.price = price;
     }
 
-  /*
-    public List<String> getMessages() {
-        return messages;
-    }
+    /*
+      public List<String> getMessages() {
+          return messages;
+      }
 
-    public void setMessages(List<String> messages) {
-        this.messages = messages;
-    }
-*/
+      public void setMessages(List<String> messages) {
+          this.messages = messages;
+      }
+  */
     @Override
-      public String toString() {
-        return "Product{" +
-                "name='" + name + '\'' +
-                ", price=" + price +
-                ", catogory=" + catogory +
+    public String toString() {
+        return "{" + "\n" +
+                "\"name\": \"" + name + "\",\n" +
+                "\"price\": " + price + ",\n" +
+                "\"catogory\": \"" + catogory + "\"\n" +
                 '}';
     }
 
     public String toString2() {
-        return name + " " + price + " " + catogory + '\n';
+        //String.format("%32s%10d%16s", name, price, catogory)
+//      return String.format("%s%s%s", formatter(name, 32), formatter(String.valueOf(price),10), formatter(catogory,16)) + '\n';
+        return String.format("%-32s%-10d%-16s", name, price, catogory) + "\n";
     }
 
-    public Product getProductObj() {
+   /* public String formatter(String s, Integer n) {
+        if (s.length() > n) {
+            return s;
+        } else {
+            for (int i = 0; i < n - s.length(); i++) {
+                s = s + " ";
+            }
+        }
+        return s;
+    }
+
+   */
+
+ /*   public Product getProductObj() {
         Product tempProduct = new Product();
-        tempProduct.name=name;
-        tempProduct.price=price;
-        tempProduct.catogory=catogory;
+        tempProduct.name = name;
+        tempProduct.price = price;
+        tempProduct.catogory = catogory;
 
         return tempProduct;
-
-    }
-
+*/
 }
+
 

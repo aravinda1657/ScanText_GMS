@@ -75,10 +75,10 @@ public class BillFilter {
             List<String> items = new ArrayList<String>();
             List<Integer> prices = new ArrayList<Integer>();
 
-
             for (int i = 0; i < billStringArray.length; i++) {
 
                 System.out.println("Test : Data:String :" + billStringArray[i] + "itemsIdentifier=" + itemsNamesIdentifier + "priceIdentifier =" + priceIdentifier);
+                billStringArray[i]=billStringArray[i].trim();
 
                 if (billStringArray[i].toLowerCase().contains("price")) {
                     itemsNamesIdentifier = 1;
@@ -113,17 +113,15 @@ public class BillFilter {
                 temp.price = prices.get(i);
                 temp.catogory = "Other";
                 products.add(temp);
-                System.out.println("AppTest_BF :  added " + i + "\n" + products.get(i));
+                //System.out.println("AppTest_BF :  added " + i + "\n" + products.get(i));
             }
             System.out.println("AppTest_BF :  added all Products");
 
-
-            for (int i = 0; i < products.size(); i++) {
-                Log.i("AppTest_BF : Productdata", "> initial_Items " + i + "\n" + products.get(i));
-                System.out.println("AppTest_BF :  > initial_Items " + i + "\n" + products.get(i));
+           /*for (int i = 0; i < products.size(); i++) {
+                //Log.i("AppTest_BF : Productdata", "> initial_Items " + i + "\n" + products.get(i));
+                //System.out.println("AppTest_BF :  > initial_Items " + i + "\n" + products.get(i));
             }
-
-
+            */
         } catch (Exception e) {
             Log.e("AppTest_BF : dataError", e.getMessage());
         }

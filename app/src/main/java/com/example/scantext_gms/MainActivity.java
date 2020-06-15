@@ -1,9 +1,11 @@
 package com.example.scantext_gms;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -11,45 +13,35 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONObject;
-
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import java.lang.Appendable;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int CAMERA_PERMISSION_CODE = 100;
+    private static final int STORAGE_PERMISSION_CODE = 101;
 
     int scanTextOverCamera_requestCode = 1, scanTextFromImage_requestCode = 2;
     String scannedText;
@@ -63,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     SharedPreferences prefs = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,16 +71,17 @@ public class MainActivity extends AppCompatActivity {
         scannedText = editTextView.getText().toString();
 
         //TODO implement on First Run Method
-        initilizeBaseProductsJSON();
+        //initilizeBaseProductsJSON();
         prefs = getSharedPreferences("com.example.scantext_gms", MODE_PRIVATE);
         if (prefs.getBoolean("firstrun", true)) {
             // Do first run stuff here then set 'firstrun' as false
             // using the following line to edit/commit prefs
-            //initilizeBaseProductsJSON();
+            requestPermissions();
+            initilizeBaseProductsJSON();
             prefs.edit().putBoolean("firstrun", false).commit();
         }
 
-        getItemsFromText_btn.callOnClick();
+        //getItemsFromText_btn.callOnClick();
 
         captureBillBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,15 +151,30 @@ public class MainActivity extends AppCompatActivity {
             InputStream is = getAssets().open("BaseProducts.json");
             File destinationSystem = new File(getApplicationContext().getFilesDir() + "/BaseProducts.json");
             Log.i("AppTest_Main : Paths : System-Data", is.toString() + "  " + destinationSystem.toString());
-            JsonReadWrite.copyFileUsingStream( is,destinationSystem);
+            JsonReadWrite.copyFileUsingStream(is, destinationSystem);
 
 //context.getExternalFilesDir()
 
+            InputStream is2 = getAssets().open("BaseProducts.json");
             File directory_documents = Environment.getExternalStoragePublicDirectory("DIRECTORY_DOCUMENTS");//Creates a public directory for app.
             Log.i("AppTest_Main : Paths", is.toString() + "Executing getApplicationContext().getExternalFilesDir(null) ");
             File destination = new File(getApplicationContext().getExternalFilesDir(null) + "/BaseProducts.json");
             Log.i("AppTest_Main : Paths", is.toString() + "  " + destination.toString());
-            JsonReadWrite.copyFileUsingStream(is, destination);
+            JsonReadWrite.copyFileUsingStream(is2, destination);
+
+
+            //UserProducts.json Initilize
+            InputStream is3 = getAssets().open("UserProducts.json");
+            destinationSystem = new File(getApplicationContext().getFilesDir() + "/UserProducts.json");
+            Log.i("AppTest_Main : Paths : System-Data", is.toString() + "  " + destinationSystem.toString());
+            JsonReadWrite.copyFileUsingStream(is3, destinationSystem);
+
+            InputStream is4 = getAssets().open("UserProducts.json");
+            directory_documents = Environment.getExternalStoragePublicDirectory("DIRECTORY_DOCUMENTS");//Creates a public directory for app.
+            Log.i("AppTest_Main : Paths", is.toString() + "Executing getApplicationContext().getExternalFilesDir(null) ");
+            destination = new File(getApplicationContext().getExternalFilesDir(null) + "/UserProducts.json");
+            Log.i("AppTest_Main : Paths", is.toString() + "  " + destination.toString());
+            JsonReadWrite.copyFileUsingStream(is4, destination);
 
         } catch (Exception e) {
             Log.i("AppTest_Main : Productdata", "ErrorCopying file : " + e.getMessage());
@@ -193,15 +202,19 @@ public class MainActivity extends AppCompatActivity {
             newProducts = JsonReadWrite.getCatogoryFromBaseProductsJSONFile(newProducts, baseProductsMapDictionary);
 
 
-            Writer writer = Files.newBufferedWriter(Paths.get(getApplicationContext().getFilesDir() + "/UserProducts.json"));
-            JsonReadWrite.writeObjectsToUserJSONFile(newProducts, writer);
 
+
+
+      /*      Writer writer = Files.newBufferedWriter(Paths.get(getApplicationContext().getExternalFilesDir("DIRECTORY_DOCUMENTS") + "/UserProducts.json"));
+            Log.i("AppTest_Main : " , writer.toString());
+            JsonReadWrite.writeObjectsToUserJSONFile(newProducts, writer);
+*/
+            writeToJsonFile(newProducts);
 
             //implement Update UserJson File with new products
             //impelemet Read updated user Json File
 
             //
-
 
 
             //Append the Newly Semi - Catogorized Products into UserProducts.Json
@@ -282,45 +295,182 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e("AppTest_Main : Json ", "Error : " + e.getMessage());
         }
-
+        //Print Products Scanned along with their Categories
         //Print Products to String
-        scannedText = "Product      Price      Category \n"; //Append this in Activity
+        String newProductsJSONString = "";
+        scannedText = "Product                         Price     Category \n"; //Append this in Activity
         for (int i = 0; i < newProducts.size(); i++) {
-            Log.i("AppTest_Main : Productdata", "> initial_Items " + i + "\n" + newProducts.get(i));
-            System.out.println("AppTest_Main :  > initial_Items " + i + "\n" + newProducts.get(i));
+            //Log.i("AppTest_Main : Productdata", "> initial_Items " + i + "\n" + newProducts.get(i));
+            // System.out.println("AppTest_Main :  > initial_Items " + i + "\n" + newProducts.get(i));
             scannedText = scannedText + newProducts.get(i).toString2();
+            // System.out.format("%32s%10d%16s", newProducts);
+            newProductsJSONString = newProductsJSONString + newProducts.get(i).toString() + ",\n";
         }
+
+        Log.v("AppTest_Main : Json ", "Data :\n\n newProductsJSONString\n\n" + newProductsJSONString);
+        Log.v("AppTest_Main : Json ", "Data : \n\n setText-Output \n\n" + scannedText);
     }
 
-    public void analyseSpends( List<Product> products ){
+    public void analyseSpends(List<Product> products) {
         Map<String, Float> catogorySpendsMapDictionary = new HashMap<String, Float>();
         catogorySpendsMapDictionary = spendCatogorize(products);
-        
+
         String spendsStr = "";
         Set<String> keySet = catogorySpendsMapDictionary.keySet();
         for (String key : keySet) {
-            spendsStr= spendsStr + key.toString() + "   :   " + catogorySpendsMapDictionary.get(key).toString()+"\n";
+            spendsStr = spendsStr + key.toString() + "   :   " + catogorySpendsMapDictionary.get(key).toString() + "\n";
         }
         Log.i("AppTest_Main : spendsStr : /n", spendsStr.toString());
         editTextView.setText(spendsStr);
     }
 
-    public Map<String, Float> spendCatogorize(List<Product> products ){
-        Map<String, Float>  catogorySpendsMapDictionary = new HashMap<String, Float>();
+    public Map<String, Float> spendCatogorize(List<Product> products) {
+        Map<String, Float> catogorySpendsMapDictionary = new HashMap<String, Float>();
 
-        for (int i=0;i<products.size();i++) {
+        for (int i = 0; i < products.size(); i++) {
 
-          if(!catogorySpendsMapDictionary.containsKey((products.get(i).catogory.toLowerCase()))) {
-              catogorySpendsMapDictionary.put(products.get(i).catogory.toLowerCase(), (float) products.get(i).price);
-          }else{
-              Float catogorySum=catogorySpendsMapDictionary.get(products.get(i).catogory.toLowerCase());
-              catogorySum=catogorySum+products.get(i).price;
-              catogorySpendsMapDictionary.put(products.get(i).catogory.toLowerCase(), catogorySum );
-          }
+            if (!catogorySpendsMapDictionary.containsKey((products.get(i).catogory.toLowerCase()))) {
+                catogorySpendsMapDictionary.put(products.get(i).catogory.toLowerCase(), (float) products.get(i).price);
+            } else {
+                Float catogorySum = catogorySpendsMapDictionary.get(products.get(i).catogory.toLowerCase());
+                catogorySum = catogorySum + products.get(i).price;
+                catogorySpendsMapDictionary.put(products.get(i).catogory.toLowerCase(), catogorySum);
+            }
             //????if(newProducts.contains(products.get(i)))
         }
         Log.i("AppTest_Main : catogorySpendsMapDictionary : /n", catogorySpendsMapDictionary.toString());
         return catogorySpendsMapDictionary;
     }
 
+
+    public void writeToJsonFile(List<Product> myProducts) throws IOException {
+        // writeObjectsToUserJSONFile(newProducts);
+        writemethod2(myProducts);
+    }
+
+    public void writeObjectsToUserJSONFile(List<Product> newProducts) {
+        Log.i("AppTest_JRW : Json ", "\n\nExecuting : writeObjectsToUserJSONFile : : Start");
+  /*      for (int i = 0; i < newProducts.size(); i++) {
+            Log.v("AppTest_ : Json ", newProducts.get(i).name);
+        }*/
+
+        try {
+            Writer myWriter = Files.newBufferedWriter(Paths.get(getApplicationContext().getExternalFilesDir("DIRECTORY_DOCUMENTS") + "/UserProducts.json"));
+            Log.i("AppTest_Main : ", "\nWriter\n" + myWriter.toString() + "\n\n getApplicationContext().getExternalFilesDir(\"DIRECTORY_DOCUMENTS\")\n" + getApplicationContext().getExternalFilesDir("DIRECTORY_DOCUMENTS"));
+
+            Gson gson = new Gson();
+            Type listProductType = new TypeToken<List<Product>>() {
+            }.getType();
+            String json = new Gson().toJson(newProducts);
+            Log.v("AppTest_JRW : Json ", "writeObjectsToUserJSONFile JsonFormat\n\n" + json);
+            Log.v("AppTest_JRW : Json Type ", listProductType.toString());
+            // Log.v("AppTest_ : Json Type ", newProducts.getType());
+            gson.toJson(json, myWriter);
+            //  gson.toJson(newProducts, listProductType, writer);
+        } catch (Exception e) {
+            Log.e("AppTest_JRW : Json ", "Error : writeObjectsToUserJSONFile" + e.getMessage());
+        }
+        Log.v("AppTest_JRW : Json ", "Executed : writeObjectsToUserJSONFile : : End");
+    }
+
+    public void writemethod2(List<Product> myProducts) throws IOException {
+
+        Log.v("AppTest_JRW : Json ", "\n\n" + getApplicationContext().getExternalFilesDir("DIRECTORY_DOCUMENTS") + "/UserProducts.json");
+
+        Writer writer = new FileWriter(getApplicationContext().getExternalFilesDir("DIRECTORY_DOCUMENTS") + "/UserProducts.json");
+        new Gson().toJson(myProducts, writer);
+        writer.close();
+/*
+        Writer writer2 = new FileWriter(getApplicationContext().getExternalFilesDir("DIRECTORY_DOCUMENTS") + "/UserProducts.json");
+        new Gson().toJson(myProducts, writer2);
+        writer2.close();
+
+        Writer writer3 = Files.newBufferedWriter(Paths.get(getApplicationContext().getExternalFilesDir("DIRECTORY_DOCUMENTS") + "/UserProducts.json"));
+        Gson gson = new Gson();
+        gson.toJson(myProducts, writer3);
+        writer3.close();
+
+        Writer writer4 = new FileWriter(getApplicationContext().getExternalFilesDir("DIRECTORY_DOCUMENTS") + "/UserProducts.json");
+        new Gson().toJson(myProducts, writer4);
+        writer4.close();
+
+        Writer writer5 = Files.newBufferedWriter(Paths.get("UserProducts.json"));
+        // convert user object to JSON file
+        Gson gson2 = new Gson();
+        gson2.toJson(myProducts, writer5);
+
+        // close writer
+  //    writer.close();
+
+        // close the writer
+*/
+
+    }
+
+    public void requestPermissions() {
+
+        checkPermission(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
+        checkPermission(Manifest.permission.CAMERA,
+                CAMERA_PERMISSION_CODE);
+
+    }
+
+    public void checkPermission(String permission, int requestCode) {
+
+        // Checking if permission is not granted
+        if (ContextCompat.checkSelfPermission(
+                MainActivity.this,
+                permission)
+                == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat
+                    .requestPermissions(
+                            MainActivity.this,
+                            new String[]{permission},
+                            requestCode);
+        } else {
+            Toast
+                    .makeText(MainActivity.this,
+                            "Permission already granted",
+                            Toast.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super
+                .onRequestPermissionsResult(requestCode,
+                        permissions,
+                        grantResults);
+
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this,
+                        "Camera Permission Granted",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            } else {
+                Toast.makeText(MainActivity.this,
+                        "Camera Permission Denied",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        } else if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this,
+                        "Storage Permission Granted",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            } else {
+                Toast.makeText(MainActivity.this,
+                        "Storage Permission Denied",
+                        Toast.LENGTH_SHORT)
+                        .show();
+            }
+        }
+    }
 }

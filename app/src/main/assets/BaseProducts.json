@@ -7,6 +7,36 @@
   {
     "name": "Marie Gold",
     "price": 0,
-    "catogory": "Food"
+    "catogory": "Grocery"
+  },
+  {
+    "name": "CINTHOL SOAP",
+    "price": 100,
+    "catogory": "Grocery"
+  },
+  {
+    "name": "CORN FLAKES",
+    "price": 50,
+    "catogory": "Grocery"
+  },
+  {
+    "name": "SPINACH",
+    "price": 125,
+    "catogory": "Grocery"
+  },
+  {
+    "name": "RED CHILLI",
+    "price": 50,
+    "catogory": "Grocery"
+  },
+  {
+    "name": "T-SHIRT",
+    "price": 100,
+    "catogory": "Fashion"
+  },
+  {
+    "name": "PILLOWS",
+    "price": 300,
+    "catogory": "Furniture"
   }
 ]

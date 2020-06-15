@@ -42,6 +42,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.*;
 
 public class JsonReadWrite {
 
@@ -125,16 +126,18 @@ public class JsonReadWrite {
         Log.i("AppTest_JRW : Json ", "Executing : writeObjectsToUserJSONFile");
         try {
             String json = new Gson().toJson(newProducts);
-            Log.i("AppTest_JRW : Json ", "writeObjectsToUserJSONFile" + json);
+            Log.i("AppTest_JRW : Json ", "writeObjectsToUserJSONFile Json Data \n\n" + json);
 
-            for(int i=0; i<newProducts.size();i++)
+ /*           for(int i=0; i<newProducts.size();i++)
             {
-                Log.e("AppTest_ : Json ", newProducts.get(i).name);
+                Log.v("AppTest_ : Json ", newProducts.get(i).name);
             }
+   */
             Gson gson = new Gson();
             Type listProductType = new TypeToken<List<Product>>() {}.getType();
-            Log.e("AppTest_ : Json Type ", listProductType.toString());
-            //Log.e("AppTest_ : Json Type ", getType());
+            Log.v("AppTest_ : Json Type ", listProductType.toString());
+          // Log.v("AppTest_ : Json Type ", newProducts.getType());
+
 
             gson.toJson(newProducts,listProductType, writer);
         } catch (Exception e) {
